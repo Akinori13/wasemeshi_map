@@ -4,12 +4,35 @@ import DefalutLayout from "../layouts/default.astro";
 
 <DefalutLayout>
 	<div id="map"></div>
+	<div class="button_container">
+		<button id="button">ルーレット開始</button>
+	</div>
 </DefalutLayout>
 
 <style>
 	#map {
-		height: 80vh;
+		height: 60vh;
 		width: 100%;
+	}
+
+	.button_container {
+		display: flex;
+		justify-content: center;
+	}
+
+	#button {
+		margin-top: 20px;
+		padding: 10px 20px;
+		border-radius: 5px;
+		border: 1px solid #ccc;
+		background-color: #fff;
+		font-size: 16px;
+		cursor: pointer;
+		width: 100%;
+		max-width: 720px;
+	}
+	#button:hover {
+		background-color: #eee;
 	}
 </style>
 
@@ -40,13 +63,17 @@ import DefalutLayout from "../layouts/default.astro";
 	// お店を表示
 	L.geoJSON(GeoJson, {
 		onEachFeature: (feature: any, layer: any) => {
-			layer.bindTooltip(
-				feature.properties.name + "★".repeat(feature.properties.star),
-				{
-					permanent: true,
-					direction: "top",
-				}
-			);
+			layer.bindTooltip(feature.properties.name, {
+				permanent: true,
+				direction: "top",
+			});
 		},
 	}).addTo(map);
+
+	const button = document.getElementById("button");
+	button?.addEventListener("click", () => {
+		const random = Math.floor(Math.random() * GeoJson.features.length);
+		const shop = GeoJson.features[random];
+		alert(shop?.properties.name);
+	});
 </script>
