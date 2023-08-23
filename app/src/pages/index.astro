@@ -4,6 +4,21 @@ import DefalutLayout from "../layouts/default.astro";
 
 <DefalutLayout>
 	<div id="map"></div>
+	<div  class="filters_container">
+		<h3>ルーレット絞り込み</h3>
+		<div class="filters">
+			<div>
+				<label for="checkbox_ramen">
+					<input type="checkbox" name="ラーメン" id="checkbox_ramen">ラーメン
+				</label>
+			</div>
+			<div>
+				<label for="checkbox_aburasoba">
+					<input type="checkbox" name="油そば" id="checkbox_aburasoba">油そば
+				</label>
+			</div>
+		</div>
+	</div>
 	<div class="button_container">
 		<button id="button">ルーレット開始！</button>
 	</div>
@@ -11,8 +26,25 @@ import DefalutLayout from "../layouts/default.astro";
 
 <style>
 	#map {
-		height: 80vh;
+		height: 70vh;
 		width: 100%;
+	}
+
+	.filters_container {
+		display: flex;
+		justify-content: center;
+		gap: 20px;
+		padding-top: 16px;
+	}
+	.filters {
+		display: flex;
+		justify-content: center;
+		justify-items: center;
+		gap: 16px;
+		font-size: 16px;
+	}
+	.filters label {
+		cursor: pointer;
 	}
 
 	.button_container {
@@ -72,8 +104,33 @@ import DefalutLayout from "../layouts/default.astro";
 
 	const button = document.getElementById("button");
 	button?.addEventListener("click", () => {
-		const random = Math.floor(Math.random() * GeoJson.features.length);
-		const shop = GeoJson.features[random];
-		alert(shop?.properties.name);
+		// 絞り込み
+		const chekbox_ramen = document.getElementById("checkbox_ramen") as HTMLInputElement;
+		const chekbox_aburasoba = document.getElementById("checkbox_aburasoba") as HTMLInputElement;
+		const filterd_features_of_GeoJson = GeoJson.features.filter((feature) => {
+			// 絞り込みなしの場合
+			if (chekbox_ramen.checked === false && chekbox_aburasoba.checked === false) {
+				return true;
+			}
+
+			// 絞り込みありの場合
+			if (chekbox_ramen.checked && feature.properties.tags.includes("ラーメン")) {
+				return true;
+			}
+			if (chekbox_aburasoba.checked && feature.properties.tags.includes("油そば")) {
+				return true;
+			}
+			return false;
+		});
+
+		// ルーレット
+		const random = Math.floor(Math.random() * filterd_features_of_GeoJson.length);
+		const shop = filterd_features_of_GeoJson[random];
+
+		if (shop === undefined) {
+			alert("条件に合うお店がありませんでした");
+			return;
+		}
+		alert(shop.properties.name);
 	});
 </script>
